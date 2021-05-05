@@ -21,10 +21,16 @@ def surrogate_optimize(optimizer,termination,surrogate_ensemble,
         infill_points = infill_criteria(res.X,res.F,n_infill)
 
         # Update surrogate problem
-        surrogate_problem = update(surrogate_problem,infill_points)
+        surrogate_problem = update(surrogate_ensemble,infill_points)
 
         # Update number of extra samples
         extra_samples += n_infill
 
 def update(surrogate_problem, infill_points):
+    pass
+
+def distance_search_space_infill():
+    pass
+
+def distance_objective_space_infill():
     pass

@@ -9,7 +9,7 @@ def select_random(surrogate_ensemble,x,y):
     return random.choice(surrogate_ensemble)
 
 def select_by_metric(surrogate_ensemble,metric,x,y):
-    """ Select the best surrogate using the Mean Absolute Error
+    """ Select the best surrogate using the input metric
     """
     pass
 

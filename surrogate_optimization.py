@@ -1,9 +1,11 @@
 from pymoo.optimize import minimize
 import surrogate_selection
+import infill_methods
 
-def surrogate_optimize(optimizer,termination,surrogate_problem,
-                        surrogate_ensemble,samples,infill_criteria,
-                        surrogate_selection_function=surrogate_selection.select_random,n_infill=1,max_samples=100):
+def optimize(optimizer,termination,surrogate_ensemble,samples,
+                infill_method=infill_methods.rand,
+                surrogate_selection_function=surrogate_selection.rand,
+                n_infill=1,max_samples=100):
 
     extra_samples = 0
     while extra_samples < max_samples:
@@ -16,7 +18,7 @@ def surrogate_optimize(optimizer,termination,surrogate_problem,
                verbose=True)
 
         # Compute infill points
-        infill_points = infill_criteria(res.X,res.F,n_infill)
+        infill_points = infill_method(n_infill,res.X,res.F,res.G)
 
         # Update database
         samples['X'] = samples['X'] + infill_points['X']

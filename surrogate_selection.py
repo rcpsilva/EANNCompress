@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     metric = mean_squared_error
 
-    selected = select_by_metric(surrogate_ensemble,metric,x,y)
+    selected = by_metric(surrogate_ensemble,metric,x,y)
 
     selected.fit(x,y)
     y_pred = selected.predict(x)

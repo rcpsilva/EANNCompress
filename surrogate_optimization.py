@@ -1,8 +1,9 @@
 from pymoo.optimize import minimize
+import surrogate_selection
 
 def surrogate_optimize(optimizer,termination,surrogate_problem,
                         surrogate_ensemble,samples,infill_criteria,
-                        surrogate_selection_function,n_infill=1,max_samples=100):
+                        surrogate_selection_function=surrogate_selection.select_random,n_infill=1,max_samples=100):
 
     extra_samples = 0
     while extra_samples < max_samples:

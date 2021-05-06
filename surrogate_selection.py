@@ -5,29 +5,31 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
 
-def select_random(surrogate_ensemble,x,y):
+def rand(surrogate_ensemble,x,y):
     return random.choice(surrogate_ensemble)
 
-def select_by_metric(surrogate_ensemble,metric,x,y):
+def by_metric(surrogate_ensemble,metric,x,y):
     """ Select the best surrogate using the input metric
     """
     pass
 
 #### Example 
-surrogate_ensemble = [DecisionTreeRegressor(),
-    LinearRegression(),
-    KNeighborsRegressor()]
+if __name__ == "__main__":
 
-x = np.random.rand(100,3) * 10
-y = x[:,0]**2 + x[:,1]**2 + x[:,2]**2
+    surrogate_ensemble = [DecisionTreeRegressor(),
+        LinearRegression(),
+        KNeighborsRegressor()]
 
-metric = mean_squared_error
+    x = np.random.rand(100,3) * 10
+    y = x[:,0]**2 + x[:,1]**2 + x[:,2]**2
 
-selected = select_by_metric(surrogate_ensemble,metric,x,y)
+    metric = mean_squared_error
 
-selected.fit(x,y)
-y_pred = selected.predict(x)
-accuracy = metric(y, y_pred)
+    selected = select_by_metric(surrogate_ensemble,metric,x,y)
+
+    selected.fit(x,y)
+    y_pred = selected.predict(x)
+    accuracy = metric(y, y_pred)
 
 print(selected)
 print('Accuracy in the trainning set: {}'.format(accuracy))

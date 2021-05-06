@@ -4,10 +4,10 @@ from pymoo.model.problem import Problem
 
 class SurrogateProblem(Problem):
 
-    def __init__(self,nvar,nobj,nconst,obj_surrogate,const_surrogate,lb,ub):
+    def __init__(self,nvar,obj_surrogate,const_surrogate,lb,ub):
         super().__init__(n_var=nvar,
-                         n_obj=nobj,
-                         n_constr=nconst,
+                         n_obj=len(obj_surrogate),
+                         n_constr=len(const_surrogate),
                          xl=lb,
                          xu=ub,
                          elementwise_evaluation=True)

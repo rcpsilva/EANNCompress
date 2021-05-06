@@ -1,11 +1,26 @@
 import sampling
 import benchmarks
 import numpy as np
+import surrogate_optimization
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
 
-problem = benchmarks.mw1()
+if __name__ == "__main__":
 
-samples = sampling.random(problem, 15)
+    # Define original problem
+    problem = benchmarks.mw1()
 
-print(samples['X'])
-print(samples['F'])
-print(samples['G'])
+    # Sample
+    samples = sampling.random(problem, 15)
+
+    # Define surrogate ensemble
+    surrogate_ensemble = [DecisionTreeRegressor(),
+        LinearRegression(),
+        KNeighborsRegressor()]
+
+    # Optimize 
+
+    print(samples['X'])
+    print(samples['F'])
+    print(samples['G'])

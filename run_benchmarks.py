@@ -24,7 +24,6 @@ if __name__ == "__main__":
         LinearRegression(),
         KNeighborsRegressor()]
 
-
     # Define Optimizer
     optimizer = NSGA2(
         pop_size=40,
@@ -48,7 +47,7 @@ if __name__ == "__main__":
     surrogate_selection_function = surrogate_selection.rand
 
     # Optimize 
-    surrogate_optimization.optimize(optimizer,termination,
+    surrogate_optimization.optimize(problem,optimizer,termination,
                         surrogate_ensemble,samples,infill_method,
                         surrogate_selection_function,n_infill=1,max_samples=100)
 

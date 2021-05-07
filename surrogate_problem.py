@@ -1,20 +1,19 @@
-import numpy as np
 from pymoo.util.misc import stack
 from pymoo.model.problem import Problem
 
 class SurrogateProblem(Problem):
 
-    def __init__(self,nvar,obj_surrogate,const_surrogate,lb,ub):
+    def __init__(self,nvar,lb,ub,obj_surrogates,const_surrogates=[]):
         super().__init__(n_var=nvar,
-                         n_obj=len(obj_surrogate),
-                         n_constr=len(const_surrogate),
+                         n_obj=len(obj_surrogates),
+                         n_constr=len(const_surrogates),
                          xl=lb,
-                         xu=ub,
-                         elementwise_evaluation=True)
-        self.obj_surrogate = obj_surrogate
-        self.const_surrogate = const_surrogate
+                         xu=ub)
+        self.obj_surrogates = obj_surrogates
+        self.const_surrogates = const_surrogates
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        out["F"] = self.obj_surrogate(x)
-        out["G"] = self.const_surrogate(x)
+        out["F"] = [self.obj_surrogates[i].predict(x) for i in range(len(self.obj_surrogates))]
+        if self.n_constr != 0:
+            out["G"] = [self.const_surrogates[i].predict(x) for i in range(len(self.const_surrogates))]

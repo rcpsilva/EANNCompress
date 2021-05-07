@@ -9,3 +9,8 @@ def rand(n,X,F,G=[]):
             'F':nF,
             'G':nG}
 
+def distance_search_space():
+    pass
+
+def distance_objective_space():
+    pass

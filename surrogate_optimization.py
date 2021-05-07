@@ -35,9 +35,9 @@ def optimize(problem,optimizer,termination,
             F,G = problem.evaluate(infill_points['X'])
 
         # Update database
-        samples['X'] = [samples['X'], infill_points['X']]
-        samples['F'] = [samples['F'], F]
-        samples['G'] = [samples['G'], G]
+        samples['X'] = samples['X'] + infill_points['X']
+        samples['F'] = samples['F'] + F
+        samples['G'] = samples['G'] + G
 
         # Update surrogate problem
         surrogate_problem = get_surrogate_problem(problem,

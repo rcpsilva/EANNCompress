@@ -24,7 +24,6 @@ if __name__ == "__main__":
         LinearRegression(),
         KNeighborsRegressor()]
 
-
     # Define Optimizer
     optimizer = NSGA2(
         pop_size=40,

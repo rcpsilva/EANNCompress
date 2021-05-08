@@ -1,3 +1,4 @@
+import numpy as np
 from pymoo.util.misc import stack
 from pymoo.model.problem import Problem
 
@@ -14,6 +15,6 @@ class SurrogateProblem(Problem):
 
     def _evaluate(self, x, out, *args, **kwargs):
 
-        out["F"] = [self.obj_surrogates[i].predict(x) for i in range(len(self.obj_surrogates))]
+        out["F"] = np.column_stack([self.obj_surrogates[i].predict(x) for i in range(len(self.obj_surrogates))])
         if self.n_constr != 0:
-            out["G"] = [self.const_surrogates[i].predict(x) for i in range(len(self.const_surrogates))]
+            out["G"] = np.column_stack([self.const_surrogates[i].predict(x) for i in range(len(self.const_surrogates))])

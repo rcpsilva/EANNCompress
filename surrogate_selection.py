@@ -31,5 +31,5 @@ if __name__ == "__main__":
     y_pred = selected.predict(x)
     accuracy = metric(y, y_pred)
 
-print(selected)
-print('Accuracy in the trainning set: {}'.format(accuracy))
+    print(selected)
+    print('Accuracy in the trainning set: {}'.format(accuracy))

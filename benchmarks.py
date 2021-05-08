@@ -6,7 +6,7 @@ import numpy as np
 from pymoo.factory import get_problem
 
 def zdt1():
-    return get_problem("zdt1",elementwise_evaluation=True)
+    return get_problem("zdt1")
 
 def mw1():
     return get_problem("mw1")

@@ -4,7 +4,7 @@
 
 import numpy as np
 
-def random(problem, n=100):
+def rand(problem, n=100):
     """ Performs random sampling with an uniform distribution
     Args:
         problem: a description of the problem for which the surrogate model 
@@ -17,7 +17,11 @@ def random(problem, n=100):
     lb = problem.xl # lower bound
     ub = problem.xu # upper bound 
     x = lb + np.random.rand(n,problem.n_var)*(ub-lb)
-    F,G = problem.evaluate(x)
+    if problem.n_constr == 0:
+        F = problem.evaluate(x)
+        G = []
+    else: 
+        F,G = problem.evaluate(x)
     samples = { 'X': x,
                 'F': F,
                 'G': G}

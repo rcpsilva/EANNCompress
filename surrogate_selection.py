@@ -48,5 +48,3 @@ if __name__ == "__main__":
 
     print(selected)
     print('Accuracy in the trainning set: {}'.format(accuracy))
-    print(y)
-    print(y_pred)

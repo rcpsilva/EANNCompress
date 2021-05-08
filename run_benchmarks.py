@@ -17,13 +17,12 @@ if __name__ == "__main__":
     problem = benchmarks.mw1()
 
     # Sample
-    samples = sampling.random(problem, 15)
+    samples = sampling.rand(problem, 100)
 
     # Define surrogate ensemble
     surrogate_ensemble = [DecisionTreeRegressor(),
         LinearRegression(),
         KNeighborsRegressor()]
-
 
     # Define Optimizer
     optimizer = NSGA2(
@@ -48,10 +47,13 @@ if __name__ == "__main__":
     surrogate_selection_function = surrogate_selection.rand
 
     # Optimize 
-    surrogate_optimization.optimize(optimizer,termination,
+    res = surrogate_optimization.optimize(problem,optimizer,termination,
                         surrogate_ensemble,samples,infill_method,
-                        surrogate_selection_function,n_infill=1,max_samples=100)
+                        surrogate_selection_function,n_infill=1,
+                        max_samples=50)
 
     print(samples['X'])
     print(samples['F'])
     print(samples['G'])
+
+    print(samples['X'].shape)

@@ -12,13 +12,17 @@ def layers_types(model):
 
 def get_gzipped_model_file_size(file):
   # Returns size of gzipped model, in bytes.
+  size = 0
   try:
     _, zipped_file = tempfile.mkstemp('.zip')
     with zipfile.ZipFile(zipped_file, 'w', compression=zipfile.ZIP_DEFLATED) as f:
       f.write(file)
+    print('passou aqui')
     size = os.path.getsize(zipped_file)
+  except Exception as e:
+    print(e)
   finally:
-    os.remove(zipped_file)
+    #os.remove(zipped_file)
     return size
 
 def get_size_tflite(model, path = './'):

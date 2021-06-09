@@ -18,7 +18,7 @@ def eval_solution(X, model, model_layers,data):
   gc.collect()
   return acc, size
 
-def execute_compression(base_model, X, model_layers,training_data, validation):
+def execute_compression(base_model, X, model_layers,training, validation):
   if(X[0]):
     base_model = pruner.model_pruner(model = base_model, 
                               layers_to_prune = X[2],
@@ -26,7 +26,7 @@ def execute_compression(base_model, X, model_layers,training_data, validation):
                               sparsity = X[3], 
                               frequency = X[6], 
                               convert_to_tflite = not X[1], # converts to tfLite if quantization is false
-                              training = training_data, 
+                              training = training, 
                               validation = validation,
                               model_layers = model_layers)
 

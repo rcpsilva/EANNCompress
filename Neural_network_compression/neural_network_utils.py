@@ -29,7 +29,6 @@ def get_gzipped_model_file_size(file):
   except Exception as e:
     print(e)
   finally:
-    os.remove(zipped_file)
     return size
 
 def get_size_tflite(model, path = './'):
@@ -40,7 +39,7 @@ def get_size_tflite(model, path = './'):
 
 def get_keras_model_size(model):
   tmp_path = tempfile.mkdtemp()
-  model.save(tmp_path)
+  model.save(tmp_path+'/model.h5')
   tmp_files = [f for f in listdir(tmp_path) if isfile(join(tmp_path, f))]
   tmp_model = tmp_files[0]
   tmp_model_path = tmp_path + '/' + tmp_model

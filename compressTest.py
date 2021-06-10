@@ -25,7 +25,7 @@ trainX, testX = test_model.prep_pixels(trainX, testX)
 
 trainX, valX , trainY, valY = train_test_split(trainX, trainY, test_size=0.2)
 
-data= [trainX, trainY], [valX , valY], [testX, testY]
+data= [trainX, trainY], [valX, valY], [testX, testY]
 
 problem = compress_problem.NNCompressProblem(base_model, data)
 

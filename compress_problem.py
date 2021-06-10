@@ -19,7 +19,7 @@ class NNCompressProblem(Problem):
         self.DF =  pd.DataFrame(columns=["Pruning","Quantization","Pruned_Layers","Sparsity","Quantization_type","Pruning_Schedule","Pruning_Frequency","Accuracy","Model_Size"])
         self.model_layers = nnUtils.layers_types(self.base_model)
         #self.base_model_size = nnUtils.get_gzipped_model_file_size(base_model)
-        self.base_model_size = os.stat('final_model.h5').st_size
+        self.base_model_size = nnUtils.get_keras_model_size(base_model)#os.stat('final_model.h5').st_size
         self.num_type_layers = len(self.model_layers)
         self.fit_params = fit_params
         num_unitary_problem_variable = 5

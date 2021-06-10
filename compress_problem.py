@@ -6,19 +6,22 @@ import tensorflow as tf
 from keras.models import load_model
 import gc
 from keras import backend as K
+import os
 
 from Neural_network_compression import neural_network_utils as nnUtils
 from Neural_network_compression import nn_compression_utils as compress
 
 class NNCompressProblem(Problem):
 
-    def __init__(self, base_model, data, G=[]):
+    def __init__(self, base_model, data, G=[], fit_params=None):
         self.base_model = base_model
         self.data = data
         self.DF =  pd.DataFrame(columns=["Pruning","Quantization","Pruned_Layers","Sparsity","Quantization_type","Pruning_Schedule","Pruning_Frequency","Accuracy","Model_Size"])
         self.model_layers = nnUtils.layers_types(self.base_model)
-        self.base_model_size = nnUtils.get_gzipped_model_file_size(base_model)
+        #self.base_model_size = nnUtils.get_gzipped_model_file_size(base_model)
+        self.base_model_size = os.stat('final_model.h5').st_size
         self.num_type_layers = len(self.model_layers)
+        self.fit_params = fit_params
         num_unitary_problem_variable = 5
         number_variables = num_unitary_problem_variable + self.num_type_layers * 2 # both sparsity and pruned layer have the same size that is the number of distinct layer in the model
         xl = np.zeros(number_variables) # bottom limit
@@ -36,19 +39,23 @@ class NNCompressProblem(Problem):
 
 
     def _evaluate(self, x, out, *args, **kwargs):
-        variable_vector = self.transform_variable_vector(X = x, num_type_layers = self.num_type_layers ,num_layers = self.num_layers)
+        variable_vector = self.transform_variable_vector(X = x, num_type_layers = self.num_type_layers)
         base_model = tf.keras.models.clone_model(self.base_model)
         base_model.set_weights(self.base_model.get_weights())
-        acc,size = compress.eval_solution(X=variable_vector, model = base_model, model_layers= self.model_layers, data = self.data)
+        acc,size = compress.eval_solution(X=variable_vector,
+            model = base_model,
+            model_layers= self.model_layers,
+            data = self.data,
+            fit_params=self.fit_params)
         K.clear_session()
         del base_model
         gc.collect()
-        norm_size = size/self.model_size
+        norm_size = size/self.base_model_size
         out["F"] = [acc*-1, norm_size]
         out["G"] = self.G
 
     def transform_variable_vector(self, X, num_type_layers):
-        x1 = X[0] #executar poda
+        x1 = 1# X[0] #executar poda
         x2 = X[1] #executar quantização 
         x3 = X[2:2+num_type_layers] # camadas a serem podadas
         x4 = X[2+num_type_layers:2+num_type_layers+num_type_layers]
@@ -67,3 +74,25 @@ class NNCompressProblem(Problem):
         for i in range(num_type_layers):
             mask[2+num_type_layers+i]="real"
         return mask
+
+# if __name__ == "__main__":
+    
+#     problem = MyProblem(base_model_path='', data=data)
+
+#     algorithm = NSGA2(
+#         pop_size=10,
+#         sampling=sampling,
+#         crossover=crossover,
+#         mutation=mutation,
+#         eliminate_duplicates=True,
+#     )
+
+#     res = minimize(
+#         problem,
+#         algorithm,
+#         ('n_eval', 400),
+#         seed=69,
+#         pf=None,
+#         verbose=True,
+#         save_history=True
+#     )

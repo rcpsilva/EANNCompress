@@ -17,6 +17,14 @@ sparsityG = []
 frequencyG = 0
 index_layerG = 0
 
+def get_default_fit_params():
+  return {
+    "optimizer":'adam',
+    "loss":'categorical_crossentropy',
+    "metrics":['accuracy'],
+    "epochs":2,
+    "batch_size":32,
+  }
 
 def variable_to_layers(model_layers, X3):
    layers_to_prune=[]
@@ -47,7 +55,9 @@ def apply_pruning_polynomial(layer):
     return tfmot.sparsity.keras.prune_low_magnitude(layer,**new_pruning_params)
   return layer
 
-def model_pruner(model, layers_to_prune, schedule, sparsity,frequency, convert_to_tflite, training, validation, model_layers, log_path='./'):
+def model_pruner(model, layers_to_prune, schedule, sparsity,
+  frequency, convert_to_tflite, training,
+  validation, model_layers, fit_params, log_path='./'):
   # setando variaveis globais para serem usadas na função apply_pruning
   #1 - Constant Schecudule
   global index_layerG
@@ -77,22 +87,22 @@ def model_pruner(model, layers_to_prune, schedule, sparsity,frequency, convert_t
       tfmot.sparsity.keras.PruningSummaries(log_dir=log_dir)
   ]
 
+  used_fit_params = fit_params if fit_params is not None else get_default_fit_params()
+
   model_for_pruning.compile(
-        optimizer=keras.optimizers.Adam(0.0001),
-        loss=keras.losses.sparse_categorical_crossentropy,
-        metrics=['accuracy']
+    optimizer=used_fit_params["optimizer"],
+    loss=used_fit_params["loss"],
+    metrics=used_fit_params["metrics"]
   )
 
-  for i in range(200):
-    print(f'fit:{i}')
-    model_for_pruning.fit(
-        x = asarray(training[0]),
-        y = training[1],
-        epochs=10,
-        validation_data=(asarray(validation[0]),validation[1]),
-        batch_size=32,
-        callbacks=callbacks 
-    )
+  model_for_pruning.fit(
+    x = training[0],
+    y = training[1],
+    epochs=used_fit_params["epochs"],
+    validation_data=(asarray(validation[0]),validation[1]),
+    batch_size=used_fit_params["batch_size"],
+    callbacks=callbacks 
+  )
 
  # %tensorboard --logdir={log_dir}
   model_for_export = tfmot.sparsity.keras.strip_pruning(model_for_pruning)

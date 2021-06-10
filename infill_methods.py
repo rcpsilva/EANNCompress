@@ -1,6 +1,23 @@
 import numpy as np
 
 def rand(n,X,F,G=[]):
+    """ Implements a random infill method
+
+    From a set of possible infill points it selects n random points
+
+    Args: 
+        n: Number of infill points.
+        X: Set of samples.
+        F: The objective value for each point.
+        G: The constraint value for each point.
+
+    Returns:
+        A dict of X, F and G of the selected points.
+
+    """
+
+    
+
     random_indices = np.random.choice(X.shape[0], size=n, replace=False)
     nX = X[random_indices,:]
     nF = F[random_indices,:]

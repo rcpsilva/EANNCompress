@@ -3,6 +3,7 @@ import numpy as np
 import surrogate_selection
 import infill_methods
 from surrogate_problem import SurrogateProblem
+import sampling
 
 def optimize(problem,optimizer,termination,
                 surrogate_ensemble,samples,
@@ -26,12 +27,21 @@ def optimize(problem,optimizer,termination,
                verbose=True)
 
         # Compute and Evaluate infill points
+        if res.X is not None:
+            actual_n_infill = np.min([res.X.shape[0],n_infill])
+
+            if problem.n_constr == 0:
+                infill_points = infill_method(actual_n_infill,res.X,res.F)
+            else: 
+                infill_points = infill_method(actual_n_infill,res.X,res.F,res.G)
+        else: 
+            actual_n_infill = n_infill
+            infill_points = {'X': problem.xl + np.random.rand(actual_n_infill,problem.n_var)*(problem.xu-problem.xl)}
+        
         if problem.n_constr == 0:
-            infill_points = infill_method(n_infill,res.X,res.F)
             F = problem.evaluate(infill_points['X'])
             G = []
-        else:
-            infill_points = infill_method(n_infill,res.X,res.F,res.G)
+        else: 
             F,G = problem.evaluate(infill_points['X'])
 
         # Update database
@@ -46,7 +56,7 @@ def optimize(problem,optimizer,termination,
                             surrogate_selection_function)
 
         # Update number of extra samples
-        extra_samples += n_infill
+        extra_samples += actual_n_infill
     
     return res
 

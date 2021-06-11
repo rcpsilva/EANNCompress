@@ -12,6 +12,7 @@ from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.factory import get_sampling, get_crossover, get_mutation
 from pymoo.factory import get_termination
 from pymoo.util.plotting import plot
+import time
 
 
 if __name__ == "__main__":
@@ -23,7 +24,7 @@ if __name__ == "__main__":
     problem = benchmarks.zdt3()
 
     # Sample
-    samples = sampling.rand(problem, 200)
+    samples = sampling.rand(problem, 50)
 
     # Define surrogate ensemble
     surrogate_ensemble = [DecisionTreeRegressor(),
@@ -52,15 +53,20 @@ if __name__ == "__main__":
 
     surrogate_selection_function = surrogate_selection.rand
 
+
     # Optimize 
+    start = time.time()
     res = surrogate_optimization.optimize(problem,optimizer,termination,
                         surrogate_ensemble,samples,infill_method,
-                        surrogate_selection_function,n_infill=1,
-                        max_samples=200)
+                        surrogate_selection_function,n_infill=2,
+                        max_samples=350)
+    end = time.time()
 
     print(samples['X'].shape)
     print(samples['F'].shape)
     print(samples['G'].shape)
+
+    print('Elapsed time: {}'.format(end-start))
 
     plt.plot(samples['F'][:,0],samples['F'][:,1],'o')
     plot(problem.pareto_front(), no_fill=True)

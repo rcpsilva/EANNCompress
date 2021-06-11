@@ -29,11 +29,12 @@ def optimize(problem,optimizer,termination,
         # Compute and Evaluate infill points
         if res.X is not None:
             actual_n_infill = np.min([res.X.shape[0],n_infill])
+            non_dominated = nondominated(samples['X'],samples['F'])
 
             if problem.n_constr == 0:
-                infill_points = infill_method(actual_n_infill,res.X,res.F)
+                infill_points = infill_method(actual_n_infill,res.X,res.F,[],non_dominated['A'],non_dominated['Apf'])
             else: 
-                infill_points = infill_method(actual_n_infill,res.X,res.F,res.G)
+                infill_points = infill_method(actual_n_infill,res.X,res.F,res.G,non_dominated['A'],non_dominated['Apf'])
         else: 
             actual_n_infill = n_infill
             infill_points = {'X': problem.xl + np.random.rand(actual_n_infill,problem.n_var)*(problem.xu-problem.xl)}
@@ -84,4 +85,31 @@ def get_surrogate_problem(problem,samples,surrogate_ensemble,surrogate_selection
 def fit_surrogate(X,y,ensemble,surrogate_selection_function):
     model = surrogate_selection_function(ensemble,X,y) 
     return model.fit(X,y)
+
+def nondominated(X,F): # This is very slow, improve in the next iteration
+    
+    A = None
+    Apf = None
+    
+    for i in range(len(F)):
+        non_dom = True
+        for j in range(len(F)):
+            if i != j:
+                if (F[i] >= F[j]).all():
+                    non_dom = False
+                    break
+        if non_dom:
+            if A is not None:
+                A = np.vstack((A,X[i]))
+                Apf = np.vstack((Apf,F[i]))
+                
+            else:
+                A = np.array(X[i])
+                Apf = np.array(F[i])
+
+    return {'A': A, 'Apf': Apf}
+
+
+
+                 
 

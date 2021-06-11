@@ -11,18 +11,19 @@ from sklearn.neighbors import KNeighborsRegressor
 from pymoo.algorithms.nsga2 import NSGA2
 from pymoo.factory import get_sampling, get_crossover, get_mutation
 from pymoo.factory import get_termination
+from pymoo.util.plotting import plot
 
 
 if __name__ == "__main__":
 
     # Define original problem
-    problem = benchmarks.mw1()
+    # problem = benchmarks.mw1()
 
     # Define original problem
-    # problem = benchmarks.zdt1()
+    problem = benchmarks.zdt3()
 
     # Sample
-    samples = sampling.rand(problem, 100000)
+    samples = sampling.rand(problem, 200)
 
     # Define surrogate ensemble
     surrogate_ensemble = [DecisionTreeRegressor(),
@@ -31,8 +32,8 @@ if __name__ == "__main__":
 
     # Define Optimizer
     optimizer = NSGA2(
-        pop_size=50,
-        n_offsprings=50,
+        pop_size=100,
+        n_offsprings=100,
         sampling=get_sampling("real_random"),
         crossover=get_crossover("real_sbx", prob=0.9, eta=15),
         mutation=get_mutation("real_pm", eta=20),
@@ -54,14 +55,15 @@ if __name__ == "__main__":
     # Optimize 
     res = surrogate_optimization.optimize(problem,optimizer,termination,
                         surrogate_ensemble,samples,infill_method,
-                        surrogate_selection_function,n_infill=10,
-                        max_samples=500)
+                        surrogate_selection_function,n_infill=1,
+                        max_samples=200)
 
     print(samples['X'].shape)
     print(samples['F'].shape)
     print(samples['G'].shape)
 
     plt.plot(samples['F'][:,0],samples['F'][:,1],'o')
+    plot(problem.pareto_front(), no_fill=True)
     plt.show()
 
     print(samples['X'].shape)

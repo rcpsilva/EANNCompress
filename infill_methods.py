@@ -17,7 +17,6 @@ def rand(n,X,F,G=[]):
     """
 
     
-
     random_indices = np.random.choice(X.shape[0], size=n, replace=False)
     nX = X[random_indices,:]
     nF = F[random_indices,:]
@@ -50,6 +49,21 @@ def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
     return solutions_indices
 
 def distance_search_space(n, X, F, A, G=[]):
+    """ Sample infill points based on the distance in the seacr space
+
+    From a set of possible infill points it selects the the one with the most distant neighbors
+
+    Args: 
+        n: Number of infill points.
+        X: Set of samples.
+        F: The objective value for each point.
+        G: The constraint value for each point.
+
+    Returns:
+        A dict of X, F and G of the selected points.
+
+    """
+
     solutions_indices = distance_search_space_indices(n, X, A)
     nX = X[solutions_indices,:]
     nF = F[solutions_indices,:]
@@ -57,10 +71,6 @@ def distance_search_space(n, X, F, A, G=[]):
     return {'X':nX,
             'F':nF,
             'G':nG}
-
-
-        
-        
 
 def distance_objective_space(n, X, F, Apf, G=[], great_is_better=False):
     no_dominated_non_solution_indices = np.arange(len(F))

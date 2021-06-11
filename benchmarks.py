@@ -8,6 +8,12 @@ from pymoo.factory import get_problem
 def zdt1():
     return get_problem("zdt1")
 
+def zdt2():
+    return get_problem("zdt2")
+
+def zdt3():
+    return get_problem("zdt3")
+
 def mw1():
     return get_problem("mw1")
 

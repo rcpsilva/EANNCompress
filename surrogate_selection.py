@@ -1,13 +1,27 @@
 import random
 import numpy as np
-from sklearn.metrics import mean_squared_error, make_scorer
+from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, r2_score, make_scorer
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
+from scipy import stats
 
 def rand(surrogate_ensemble,x,y):
     return random.choice(surrogate_ensemble)
+
+def mse(surrogate_ensemble,x,y):
+    return by_metric(surrogate_ensemble,mean_squared_error,x,y, metric_great_is_better=False)
+
+def mape(surrogate_ensemble,x,y):
+    return by_metric(surrogate_ensemble,mean_absolute_percentage_error,x,y, metric_great_is_better=False)
+
+def r2(surrogate_ensemble,x,y):
+    return by_metric(surrogate_ensemble,r2_score,x,y, metric_great_is_better=True)
+
+def spearman(surrogate_ensemble,x,y):
+    sp = lambda x, y : stats.spearmanr(x,y)[0]
+    return by_metric(surrogate_ensemble,sp,x,y, metric_great_is_better=True)
 
 def by_metric(surrogate_ensemble,metric,x,y, metric_great_is_better=True):
     """ Select the best surrogate using the input metric

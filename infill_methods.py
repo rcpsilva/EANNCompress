@@ -1,6 +1,6 @@
 import numpy as np
 
-def rand(n,X,F,G=[]):
+def rand(n,X,F,G=[],A=[],Apf=[]):
     """ Implements a random infill method
 
     From a set of possible infill points it selects n random points
@@ -48,7 +48,7 @@ def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
     
     return solutions_indices
 
-def distance_search_space(n, X, F, A, G=[]):
+def distance_search_space(n,X,F,G=[],A=[],Apf=[]):
     """ Sample infill points based on the distance in the seacr space
 
     From a set of possible infill points it selects the the one with the most distant neighbors
@@ -72,7 +72,7 @@ def distance_search_space(n, X, F, A, G=[]):
             'F':nF,
             'G':nG}
 
-def distance_objective_space(n, X, F, Apf, G=[], great_is_better=False):
+def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
     no_dominated_non_solution_indices = np.arange(len(F))
     dominated_non_solution_indices = []
     

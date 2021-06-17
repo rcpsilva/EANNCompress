@@ -55,7 +55,7 @@ class NNCompressProblem(Problem):
         out["G"] = self.G
 
     def transform_variable_vector(self, X, num_type_layers):
-        x1 = 1# X[0] #executar poda
+        x1 = X[0] #executar poda
         x2 = X[1] #executar quantização 
         x3 = X[2:2+num_type_layers] # camadas a serem podadas
         x4 = X[2+num_type_layers:2+num_type_layers+num_type_layers]

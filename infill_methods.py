@@ -28,6 +28,7 @@ def rand(n,X,F,G=[],A=[],Apf=[]):
 def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
     solutions_indices = []
     min_distances = []
+
     if(X_non_solution_indices is None):
         X_non_solution_indices = np.arange(len(X))
     
@@ -39,7 +40,7 @@ def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
     
     X_solution_index = np.argmax(min_distances)
     solutions_indices.append(X_non_solution_indices[X_solution_index])
-    if (n > 1):
+    if (n > 1 and len(X)>0):
         new_A = np.append(A, [X[X_solution_index]], axis=0)
         new_X = np.delete(X, X_solution_index, axis=0)
         X_non_solution_indices = np.delete(X_non_solution_indices, X_solution_index)
@@ -82,25 +83,27 @@ def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
         for Apfj in Apf:
             if (max(np.subtract(Fi,Apfj))>0):
                 dominated_non_solution_indices.append(no_dominated_non_solution_indices[indice])
-                no_dominated_non_solution_indices = np.delete(no_dominated_non_solution_indices, indice)
-                F_non_dominated = np.delete(F_non_dominated, indice, axis=0)
                 break
-
+    no_dominated_non_solution_indices = np.delete(no_dominated_non_solution_indices, dominated_non_solution_indices)
+    F_non_dominated = np.delete(F_non_dominated, dominated_non_solution_indices, axis=0)
     n_F_non_dominated =  len(F_non_dominated)
     number_infill_non_random = min(n, n_F_non_dominated)
-    non_dominated_solutions = distance_search_space_indices(number_infill_non_random, F_non_dominated, Apf, no_dominated_non_solution_indices)
+    non_dominated_solutions = []
+    if number_infill_non_random > 0 :
+        non_dominated_solutions = distance_search_space_indices(number_infill_non_random, F_non_dominated, Apf, no_dominated_non_solution_indices)
     
     random_indices =[]
-    if(n > n_F_non_dominated):
-        number_infill_random = n - n_F_non_dominated
+    if(n > number_infill_non_random):
+        number_infill_random = n - number_infill_non_random
         random_indices = np.random.choice(dominated_non_solution_indices, size=number_infill_random, replace=False)
 
     solutions_indices = non_dominated_solutions
     solutions_indices = np.append(solutions_indices, random_indices)
-
+    solutions_indices = solutions_indices.astype(int)
     nX = X[solutions_indices,:]
     nF = F[solutions_indices,:]
     nG = G[solutions_indices,:] if G else [] 
+
     return {'X':nX,
             'F':nF,
             'G':nG}

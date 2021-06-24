@@ -25,7 +25,23 @@ def rand(n,X,F,G=[],A=[],Apf=[]):
             'F':nF,
             'G':nG}
 
-def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
+def farthest_points_indices(n, X, A, X_non_solution_indices = None):
+    """ Returns the n farthest X points indices with relation with A
+
+    From a X set, the function returns the indices of the n points that
+    have the maximum euclidean distance with the nearest point of the set A
+
+    Args:
+        n: the number of samples indices to return. Must be a positive integer
+        X: A set samples of which the points will be chosen
+        A: A set of known samples
+        X_non_solution_indices: indices of X that cannot be used as a solution.
+    
+    Returns:
+        A set of n indices in order, from the farthest point of X to the 
+        nearest. example
+        [4,2,16,15]
+    """
     solutions_indices = []
     min_distances = []
 
@@ -44,28 +60,30 @@ def distance_search_space_indices(n, X, A, X_non_solution_indices = None):
         new_A = np.append(A, [X[X_solution_index]], axis=0)
         new_X = np.delete(X, X_solution_index, axis=0)
         X_non_solution_indices = np.delete(X_non_solution_indices, X_solution_index)
-        new_solution = distance_search_space_indices(n-1, new_X, new_A, X_non_solution_indices= X_non_solution_indices)
+        new_solution = farthest_points_indices(n-1, new_X, new_A, X_non_solution_indices= X_non_solution_indices)
         solutions_indices = np.append(solutions_indices, new_solution)
     
     return solutions_indices
 
 def distance_search_space(n,X,F,G=[],A=[],Apf=[]):
-    """ Sample infill points based on the distance in the seacr space
+    """ Sample infill points based on the distance in the search space
 
-    From a set of possible infill points it selects the the one with the most distant neighbors
+    From a set of possible infill points it selects the 'n' with the most distant neighbors
 
     Args: 
         n: Number of infill points.
         X: Set of samples.
         F: The objective value for each point.
         G: The constraint value for each point.
+        A: set of known points
+        Apf: The objective value for each point of 'A'
 
     Returns:
         A dict of X, F and G of the selected points.
 
     """
 
-    solutions_indices = distance_search_space_indices(n, X, A)
+    solutions_indices = farthest_points_indices(n, X, A)
     nX = X[solutions_indices,:]
     nF = F[solutions_indices,:]
     nG = G[solutions_indices,:] if G else [] 
@@ -74,6 +92,24 @@ def distance_search_space(n,X,F,G=[],A=[],Apf=[]):
             'G':nG}
 
 def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
+    """ Sample infill points based on the distance in the objective space
+
+    From a set of possible infill points it selects 'n' with the most distant and
+    non-dominanted neighbors in the objective space, if less than 'n' points are non-dominated
+    than the remaining points are randomly selected.
+
+    Args: 
+        n: Number of infill points.
+        X: Set of samples.
+        F: The objective value for each point.
+        G: The constraint value for each point.
+        A: set of known points
+        Apf: The objective value for each point of 'A'
+
+    Returns:
+        A dict of X, F and G of the selected points.
+
+    """
     no_dominated_non_solution_indices = np.arange(len(F))
     dominated_non_solution_indices = []
     
@@ -90,7 +126,7 @@ def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
     number_infill_non_random = min(n, n_F_non_dominated)
     non_dominated_solutions = []
     if number_infill_non_random > 0 :
-        non_dominated_solutions = distance_search_space_indices(number_infill_non_random, F_non_dominated, Apf, no_dominated_non_solution_indices)
+        non_dominated_solutions = farthest_points_indices(number_infill_non_random, F_non_dominated, Apf, no_dominated_non_solution_indices)
     
     random_indices =[]
     if(n > number_infill_non_random):

@@ -33,7 +33,7 @@ def by_metric(surrogate_ensemble,metric,x,y, metric_great_is_better=True):
         model_scores = cross_val_score(model, x, y, scoring=metric)
         scores[index] = np.mean(model_scores)
     
-    index_best_model = np.argmax(scores) if metric_great_is_better else np.argmin(scores)
+    index_best_model = np.argmax(scores)
     return surrogate_ensemble[index_best_model]
 
 
@@ -55,10 +55,9 @@ if __name__ == "__main__":
     metric = mean_squared_error
 
     selected = by_metric(surrogate_ensemble,metric,X_train,y_train, metric_great_is_better=False)
-    
     selected.fit(X_train, y_train)
     y_pred = selected.predict(X_test)
     accuracy = metric(y_test, y_pred)
-
+    
     print(selected)
     print('Accuracy in the trainning set: {}'.format(accuracy))

@@ -15,7 +15,8 @@ from pymoo.util.plotting import plot
 
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
+grandparentdir =os.path.dirname(parentdir)
+sys.path.insert(1, grandparentdir) 
 
 import surrogate_optimization
 

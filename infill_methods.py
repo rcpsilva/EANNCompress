@@ -18,9 +18,9 @@ def rand(n,X,F,G=[],A=[],Apf=[]):
 
     
     random_indices = np.random.choice(X.shape[0], size=n, replace=False)
-    nX = X[random_indices,:]
-    nF = F[random_indices,:]
-    nG = G[random_indices,:] if G else [] 
+    nX = X[random_indices]
+    nF = F[random_indices]
+    nG = G[random_indices] if len(G) else [] 
     return {'X':nX,
             'F':nF,
             'G':nG}
@@ -48,11 +48,18 @@ def farthest_points_indices(n, X, A, X_non_solution_indices = None):
     if(X_non_solution_indices is None):
         X_non_solution_indices = np.arange(len(X))
     
+    axis = 1
+    # if the elements of X are numbers some functions from numpy break, like norm, this if will deal with it
+    if(type(X[0]) == np.int64 or type(X[0]) == np.float64):
+        axis = 0
     for i,Xi in enumerate(X):
         distance_vectors = np.subtract(Xi, A)
-        Euclidean_distance = np.linalg.norm(distance_vectors, ord=2, axis=1)
-        min_distance_index = np.argmin(Euclidean_distance)
-        min_distances.append(Euclidean_distance[min_distance_index])
+        Euclidean_distance = np.linalg.norm(distance_vectors, ord=2, axis=axis)
+        if(axis==0):
+            min_distances.append(Euclidean_distance)
+        else:
+            min_distance_index = np.argmin(Euclidean_distance)
+            min_distances.append(Euclidean_distance[min_distance_index])
     
     X_solution_index = np.argmax(min_distances)
     solutions_indices.append(X_non_solution_indices[X_solution_index])
@@ -84,9 +91,9 @@ def distance_search_space(n,X,F,G=[],A=[],Apf=[]):
     """
 
     solutions_indices = farthest_points_indices(n, X, A)
-    nX = X[solutions_indices,:]
-    nF = F[solutions_indices,:]
-    nG = G[solutions_indices,:] if G else [] 
+    nX = X[solutions_indices]
+    nF = F[solutions_indices]
+    nG = G[solutions_indices] if len(G) else [] 
     return {'X':nX,
             'F':nF,
             'G':nG}
@@ -116,8 +123,14 @@ def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
     F_non_dominated = F
     
     for indice, Fi in enumerate(F):
-        for Apfj in Apf:
-            if (max(np.subtract(Fi,Apfj))>0):
+        for indiceApf, Apfj in enumerate(Apf):
+            distance_vector = np.subtract(Fi,Apfj)
+            max_distance_fi_apfj = distance_vector
+            if(type(distance_vector) == np.int64 or type(distance_vector) == np.float64):
+                max_distance_fi_apfj = distance_vector
+            else: 
+                max_distance_fi_apfj = max(distance_vector)
+            if (max_distance_fi_apfj>0):
                 dominated_non_solution_indices.append(no_dominated_non_solution_indices[indice])
                 break
     no_dominated_non_solution_indices = np.delete(no_dominated_non_solution_indices, dominated_non_solution_indices)
@@ -136,9 +149,9 @@ def distance_objective_space(n, X, F, G=[], A=[], Apf=[]):
     solutions_indices = non_dominated_solutions
     solutions_indices = np.append(solutions_indices, random_indices)
     solutions_indices = solutions_indices.astype(int)
-    nX = X[solutions_indices,:]
-    nF = F[solutions_indices,:]
-    nG = G[solutions_indices,:] if G else [] 
+    nX = X[solutions_indices]
+    nF = F[solutions_indices]
+    nG = G[solutions_indices] if len(G) else [] 
 
     return {'X':nX,
             'F':nF,
@@ -150,5 +163,5 @@ if __name__ == "__main__":
 
     A = np.array([[1,2,3],[5,4,3]])
 
-    F = np.array([[10,2,3],[1,2,0],[-20,-4,-30],])
-    distance_objective_space(3, X, F, A)
+    F = np.array([10,1,0])
+    print(distance_search_space(2, X, F, np.array([[1,2,3],[5,4,3],[1,2,5]]), A))

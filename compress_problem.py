@@ -11,12 +11,26 @@ import os
 from Neural_network_compression import neural_network_utils as nnUtils
 from Neural_network_compression import nn_compression_utils as compress
 
+
+def solution_to_dict(X,acc, size_ratio, size):
+    return {
+        "Accuracy":acc,
+        "Size_Ratio":size_ratio,
+        "Model_Size":size,
+        "Pruning":X[0],
+        "Quantization":X[1],
+        "Pruned_Layers":X[2],
+        "Sparsity":X[3],
+        "Quantization_type":X[4],
+        "Pruning_Schedule":X[5],
+        "Pruning_Frequency":X[6],
+    }
 class NNCompressProblem(Problem):
 
     def __init__(self, base_model, data, G=[], fit_params=None):
         self.base_model = base_model
         self.data = data
-        self.DF =  pd.DataFrame(columns=["Pruning","Quantization","Pruned_Layers","Sparsity","Quantization_type","Pruning_Schedule","Pruning_Frequency","Accuracy","Model_Size"])
+        self.DF =  pd.DataFrame(columns=["Accuracy","Model_Size","Size_Ratio","Pruning","Quantization","Pruned_Layers","Sparsity","Quantization_type","Pruning_Schedule","Pruning_Frequency"])
         self.model_layers = nnUtils.layers_types(self.base_model)
         #self.base_model_size = nnUtils.get_gzipped_model_file_size(base_model)
         self.base_model_size = nnUtils.get_keras_model_size(base_model)#os.stat('final_model.h5').st_size
@@ -51,6 +65,7 @@ class NNCompressProblem(Problem):
         del base_model
         gc.collect()
         norm_size = size/self.base_model_size
+        self.DF = self.solution_to_csv(variable_vector, acc, norm_size, size, self.DF)
         out["F"] = [acc*-1, norm_size]
         out["G"] = self.G
 
@@ -64,6 +79,11 @@ class NNCompressProblem(Problem):
         x7 = X[-1] #frequencia de poda
         vector=[x1,x2,x3,x4,x5,x6,x7]
         return vector
+
+    def solution_to_csv(self, X,acc,size_ratio, size,DF ,path = "solucao.csv"):
+        DF = DF.append(solution_to_dict(X,acc, size_ratio, size),ignore_index=True)
+        DF.to_csv(path)
+        return DF
 
     def get_compression_mask(self):
         num_unitary_problem_variable = 5

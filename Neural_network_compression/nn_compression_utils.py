@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import gc
 from keras import backend as K
+from tqdm import tqdm
 
 from . import neural_network_utils as nnUtils
 from . import pruner
@@ -36,7 +37,8 @@ def execute_compression(base_model, X, model_layers,training, validation, fit_pa
 
   if(X[1]):
     base_model = quantizer.quantization(model = base_model,
-                              type_quantization = X[4])
+                              type_quantization = X[4],
+                              train_images=training[0])
   
   if(not X[1] and not X[0]):
     return -1
@@ -54,7 +56,7 @@ def evaluate_tflite_model(tflite_model, test_data):
 
   # Run predictions on ever y image in the "test" dataset.
   predictions = []
-  for test_element in test_data[0]:
+  for test_element in tqdm(test_data[0], desc="compressed model predictions"):
 
     test_tensor = np.expand_dims(test_element, axis=0).astype(np.float32)
     interpreter.set_tensor(input_index, test_tensor)
@@ -67,11 +69,12 @@ def evaluate_tflite_model(tflite_model, test_data):
     predictions.append(digit)
 
   print('\n')
+  interpreter.reset_all_variables()
   
   predictions = np.array(predictions)
   total = 0
   for i in range(len(predictions)):
-    if (bool(test_data[1][i][predictions[i]])):
+    if (test_data[1][i] == [predictions[i]]):
       total = total+1
   accuracy = total/len(predictions)
   return accuracy

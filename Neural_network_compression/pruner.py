@@ -5,7 +5,7 @@ from keras.models import load_model
 import gc
 from keras import backend as K
 from numpy import asarray
-
+import numpy as np
 # Global variables
 pruners_schedules =[
             tfmot.sparsity.keras.PolynomialDecay,
@@ -20,10 +20,10 @@ index_layerG = 0
 def get_default_fit_params():
   return {
     "optimizer":'adam',
-    "loss":'categorical_crossentropy',
+    "loss": keras.losses.sparse_categorical_crossentropy,
     "metrics":['accuracy'],
-    "epochs":2,
-    "batch_size":32,
+    "epochs":3,
+    "batch_size":16,
   }
 
 def variable_to_layers(model_layers, X3):
@@ -65,7 +65,7 @@ def model_pruner(model, layers_to_prune, schedule, sparsity,
   global layers_to_pruneG
   layers_to_pruneG = variable_to_layers(model_layers=model_layers, X3 = layers_to_prune)
   global sheduleG
-  sheduleG = schedule
+  sheduleG = int(schedule)
   global sparsityG
   sparsityG = layers_type_sparsity(model_layers, sparsity)#sparsity
   global frequencyG
@@ -96,10 +96,10 @@ def model_pruner(model, layers_to_prune, schedule, sparsity,
   )
 
   model_for_pruning.fit(
-    x = training[0],
-    y = training[1],
+    x = asarray(training[0]).astype(np.float32),
+    y = asarray(training[1]).astype(np.float32),
     epochs=used_fit_params["epochs"],
-    validation_data=(asarray(validation[0]),validation[1]),
+    validation_data=(asarray(validation[0]).astype(np.float32), asarray(validation[1]).astype(np.float32)),
     batch_size=used_fit_params["batch_size"],
     callbacks=callbacks 
   )

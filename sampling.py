@@ -61,7 +61,7 @@ def random_feasible(problem, n=100):
 
     return samples
 
-def lhs( n):
+def lhs(n):
     sampling = get_sampling('real_lhs' )
     x = sample(sampling, n, 2)  
     F = []

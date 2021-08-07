@@ -61,26 +61,6 @@ def random_feasible(problem, n=100):
 
     return samples
 
-def sampling(problem, n=100):    
-    """ Performs random sampling with an uniform distribution
-    Args:
-        problem: a description of the problem for which the surrogate model 
-        is going to be built
-        n: Number of samples 
-
-    Returns:
-        samples: a set of n samples
-    """
-    lb = problem.xl 
-    ub = problem.xu      
-    x = lb + np.random.rand(n,problem.n_var)*(ub-lb)    
-    F = problem.evaluate(x) 
-    G = []
-    samples = { 'X': x,
-                'F': F,
-                'G': G}
-    return samples
-
 def lhs( n):
     sampling = get_sampling('real_lhs' )
     x = sample(sampling, n, 2)  
@@ -89,5 +69,4 @@ def lhs( n):
     samples = { 'X': x,
                 'F': F,
                 'G': G}
-    plotting.plot(x, no_fill=True)
     return samples

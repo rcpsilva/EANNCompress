@@ -29,7 +29,9 @@ if __name__ == "__main__":
     randomSample = sampling.rand(problem, 70)
 
     # Define surrogate ensemble
-    
+    surrogate_ensemble = [DecisionTreeRegressor(),
+        LinearRegression(),
+        KNeighborsRegressor()]
 
     # Define Optimizer
     optimizer = NSGA2(

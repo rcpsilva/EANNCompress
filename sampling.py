@@ -3,6 +3,9 @@
 ######################################
 
 import numpy as np
+from pymoo.factory import get_sampling
+from pymoo.util import plotting
+from pymoo.interface import sample
 
 def rand(problem, n=100):
     """ Performs random sampling with an uniform distribution
@@ -49,11 +52,21 @@ def random_feasible(problem, n=100):
     while valid_samples <= n:
         sample = lb + np.random.rand(1,problem.n_var)*(ub-lb)
         F,G = problem.evaluate(sample[0])
-        if np.sum(G)==0:
-            samples['X'] = samples['X'] + sample
-            samples['F'] = samples['F'] + F
-            samples['G'] = samples['G'] + G
+        if np.sum(G)<=0 :  
+            samples['X'].append(sample)
+            samples['F'].append(F)
+            samples['G'].append(G)
 
             valid_samples += 1
 
+    return samples
+
+def lhs(n):
+    sampling = get_sampling('real_lhs' )
+    x = sample(sampling, n, 2)  
+    F = []
+    G = []
+    samples = { 'X': x,
+                'F': F,
+                'G': G}
     return samples

@@ -8,13 +8,15 @@ import sampling
 def optimize(problem,optimizer,termination,
                 surrogate_ensemble,samples,
                 infill_method=infill_methods.rand,
-                surrogate_selection_function=surrogate_selection.rand,
+                surrogate_selection_function=surrogate_selection.rand, 
+                surrogate_selection_function2 = surrogate_selection.rand,
                 n_infill=1,max_samples=100):
 
     surrogate_problem = get_surrogate_problem(problem,
                             samples,
                             surrogate_ensemble,
-                            surrogate_selection_function)
+                            surrogate_selection_function,
+                            surrogate_selection_function2)
 
     extra_samples = 0
     while extra_samples < max_samples:
@@ -24,7 +26,7 @@ def optimize(problem,optimizer,termination,
                termination,
                #seed=1,
                save_history=True,
-               verbose=True)
+               verbose=False)
 
         # Compute and Evaluate infill points
         if res.X is not None:
@@ -54,14 +56,15 @@ def optimize(problem,optimizer,termination,
         surrogate_problem = get_surrogate_problem(problem,
                             samples,
                             surrogate_ensemble,
-                            surrogate_selection_function)
+                            surrogate_selection_function,
+                            surrogate_selection_function2)
 
         # Update number of extra samples
         extra_samples += actual_n_infill
     
     return res
 
-def get_surrogate_problem(problem,samples,surrogate_ensemble,surrogate_selection_function):
+def get_surrogate_problem(problem,samples,surrogate_ensemble,surrogate_selection_function, surrogate_selection_function2):
         # Fit surrogates
     obj_surrogates = [fit_surrogate(samples['X'],
                         samples['F'][:,i],ensemble=surrogate_ensemble,
@@ -69,7 +72,7 @@ def get_surrogate_problem(problem,samples,surrogate_ensemble,surrogate_selection
                         for i in range(problem.n_obj)]
     const_surrogates = [] if problem.n_constr == 0 else [fit_surrogate(samples['X'],
                         samples['G'][:,i],ensemble=surrogate_ensemble,
-                        surrogate_selection_function=surrogate_selection_function) 
+                        surrogate_selection_function=surrogate_selection_function2) 
                         for i in range(problem.n_constr)]
 
     # Build surrogate problem

@@ -11,7 +11,7 @@ from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_termination
 from . import compression
 import pickle
-
+from pymoo.algorithms.moo.ctaea import CTAEA
 
 class MyProblem(ElementwiseProblem):
     
@@ -26,11 +26,11 @@ class MyProblem(ElementwiseProblem):
         # x representa uma unica solução a ser avaliada 
         # out é um dicionario que representa a saída
         
-        XX = compression.comprime(x, op = 'resnet50') 
+        XX = compression.comprime(x, op = 'vgg16') 
         f1 = -1*(XX[0]) 
         f2 = XX[1] 
 
-        g1 = 74.0 + f1  # restrição
+        g1 = 76.0 + f1  # restrição
         
 
         out["F"] = [f1, f2] # saida para os objetivos
@@ -39,8 +39,8 @@ class MyProblem(ElementwiseProblem):
 
 #problem = MyProblem()
 
-def problemResnet():
-    return MyProblem(limite=[1,1])
+def problemCNN():
+    return MyProblem(limite=[0,2])
 
 '''
 problem = problemResnet()
@@ -62,7 +62,10 @@ mutation = MixedVariableMutation(mask, {
     "int": get_mutation("int_pm", eta=20)
 })
 
-
+filename3 = "ref10"
+infile = open(filename3,'rb')
+ref_dirs = pickle.load(infile)
+infile.close()
 
 
 algorithm = NSGA2(
@@ -73,28 +76,41 @@ algorithm = NSGA2(
     mutation=mutation,
     eliminate_duplicates=True,
 )
+
+
+
+algorithm = CTAEA(
+    ref_dirs=ref_dirs,
+    sampling=sampling,
+    crossover=crossover,
+    mutation=mutation,
+    eliminate_duplicates=True,
+    )
+
 termination = get_termination("n_gen", 10)
-res = minimize(
-    problem,
+
+res = minimize(problem,
     algorithm,
     termination,
     seed=1,
     save_history=True,
     verbose= False
-)
+    )
+
+
+filename = 'CTAEA10Resnet'
+outfile = open(filename,'wb')
+pickle.dump(res,outfile)
+outfile.close()
 
 print("Best solution found: %s" % res.X)
 print("Function value: %s" % res.F)
 print("Constraint violation: %s" % res.CV)
 
-filename = 'original'
-outfile = open(filename,'wb')
-pickle.dump(res,outfile)
-outfile.close()
 
 print("fechou")
-'''
 
+'''
 '''
 5 3 e 5g
  [[0 0 0.03905478323288236 0.1698304195645689 1 1 1]

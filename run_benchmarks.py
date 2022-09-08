@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsRegressor
-from pymoo.algorithms.nsga2 import NSGA2
+#from pymoo.algorithms.nsga2 import NSGA2
+from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.factory import get_sampling, get_crossover, get_mutation
 from pymoo.factory import get_termination
 from pymoo.util.plotting import plot
@@ -79,7 +80,7 @@ if __name__ == "__main__":
             print(j)
             res = surrogate_optimization.optimize(problem,optimizer,termination,
                                 surrogate_ensemble,samples,infill_method,
-                                surrogate_selection_function,n_infill=2,
+                                surrogate_selection_function,surrogate_selection.spearman,n_infill=2,
                                 max_samples=200)
             end = time.time()
 

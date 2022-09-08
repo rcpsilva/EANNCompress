@@ -4,13 +4,14 @@ import surrogate_selection
 import infill_methods
 from surrogate_problem import SurrogateProblem
 import sampling
+import time
 
 def optimize(problem,optimizer,termination,
                 surrogate_ensemble,samples,
                 infill_method=infill_methods.rand,
                 surrogate_selection_function=surrogate_selection.rand, 
                 surrogate_selection_function2 = surrogate_selection.rand,
-                n_infill=1,max_samples=100):
+                n_infill=1,max_samples=100, tempo =[]):
 
     surrogate_problem = get_surrogate_problem(problem,
                             samples,
@@ -35,6 +36,7 @@ def optimize(problem,optimizer,termination,
 
             if problem.n_constr == 0:
                 infill_points = infill_method(actual_n_infill,res.X,res.F,[],non_dominated['A'],non_dominated['Apf'])
+                
             else: 
                 infill_points = infill_method(actual_n_infill,res.X,res.F,res.G,non_dominated['A'],non_dominated['Apf'])
         else: 
@@ -42,15 +44,36 @@ def optimize(problem,optimizer,termination,
             infill_points = {'X': problem.xl + np.random.rand(actual_n_infill,problem.n_var)*(problem.xu-problem.xl)}
         
         if problem.n_constr == 0:
-            F = problem.evaluate(infill_points['X'])
+            #F = problem.evaluate(infill_points['X'])
             G = []
+            xx = infill_points['X']
+            for i in range(0, infill_points['X'].shape[0]):
+                start = time.time()
+                F = problem.evaluate(xx[i])
+                end = time.time()
+                samples['X'] = np.vstack((samples['X'], xx[i]))
+                samples['F'] = np.vstack((samples['F'], F))
+                samples['G'] = np.vstack((samples['G'], G))
+                tempo.append((end-start))
         else: 
-            F,G = problem.evaluate(infill_points['X'])
+            #F,G = problem.evaluate(infill_points['X'])
+            
+            xx = infill_points['X']
+            for i in range(0, infill_points['X'].shape[0]):
+                start = time.time()
+                F,G = problem.evaluate(xx[i])
+                end = time.time()
+                samples['X'] = np.vstack((samples['X'], xx[i]))
+                samples['F'] = np.vstack((samples['F'], F))
+                samples['G'] = np.vstack((samples['G'], G))
+                tempo.append((end-start))
+
+            
 
         # Update database
-        samples['X'] = np.vstack((samples['X'], infill_points['X']))
-        samples['F'] = np.vstack((samples['F'], F))
-        samples['G'] = np.vstack((samples['G'], G))
+        #samples['X'] = np.vstack((samples['X'], infill_points['X']))
+        #samples['F'] = np.vstack((samples['F'], F))
+        #samples['G'] = np.vstack((samples['G'], G))
 
         # Update surrogate problem
         surrogate_problem = get_surrogate_problem(problem,
@@ -62,7 +85,7 @@ def optimize(problem,optimizer,termination,
         # Update number of extra samples
         extra_samples += actual_n_infill
     
-    return res
+    return res, tempo
 
 def get_surrogate_problem(problem,samples,surrogate_ensemble,surrogate_selection_function, surrogate_selection_function2):
         # Fit surrogates
